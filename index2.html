@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guida Fantastica: Web Service REST Impianti Gas con Java e GSAP!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Reset e Stili Globali */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background-color: #f4f7f6; /* Sfondo leggermente grigio */
+            overflow-x: hidden; /* Evita scroll orizzontale indesiderato */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: #2c3e50; /* Blu scuro */
+            margin-bottom: 0.8em;
+            line-height: 1.3;
+        }
+
+        h1 { font-size: 2.8rem; text-align: center; margin-bottom: 1em; }
+        h2 { font-size: 2.2rem; border-bottom: 3px solid #1abc9c; padding-bottom: 0.3em; margin-top: 2em;}
+        h3 { font-size: 1.8rem; color: #3498db; /* Blu più chiaro per H3 */ margin-top: 1.5em;}
+        h4 { font-size: 1.4rem; color: #e67e22; /* Arancione per H4 */ margin-top: 1em;}
+
+
+        p {
+            margin-bottom: 1.2em;
+            font-size: 1.05rem;
+            color: #555;
+        }
+
+        a {
+            color: #1abc9c; /* Verde acqua */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #16a085; /* Verde acqua più scuro */
+        }
+
+        code, pre {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #2d2d2d; /* Sfondo scuro per codice */
+            color: #f0f0f0; /* Testo chiaro per codice */
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        pre {
+            padding: 1em;
+            overflow-x: auto;
+            border-radius: 6px;
+            margin-bottom: 1.5em;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #1abc9c;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient */
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero h1 {
+            color: white;
+            font-size: 3.5rem;
+            margin-bottom: 0.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 1.5em;
+            font-weight: 300;
+            max-width: 700px;
+        }
+        .hero .cta-button {
+            background-color: #1abc9c;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .hero .cta-button:hover {
+            background-color: #16a085;
+            transform: translateY(-3px);
+        }
+
+        /* Sezioni */
+        section {
+            padding: 50px 0;
+            opacity: 0; /* Per animazione GSAP */
+            transform: translateY(50px); /* Per animazione GSAP */
+        }
+        section:nth-child(even) {
+            background-color: #ffffff; /* Alterna sfondi per leggibilità */
+        }
+
+        /* Card per Prerequisiti */
+        .prerequisites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 2em;
+        }
+        .prerequisite-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .prerequisite-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+        .prerequisite-card .icon {
+            font-size: 3rem;
+            color: #1abc9c;
+            margin-bottom: 15px;
+        }
+        .prerequisite-card h4 {
+            margin-top: 0;
+            color: #3498db;
+        }
+
+        /* Lista step */
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .step-list li {
+            background-color: #eaf6ff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 5px solid #3498db;
+            font-size: 1.05rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .step-list li strong {
+            color: #2980b9;
+        }
+
+        /* Alert/Note */
+        .note, .warning {
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .note {
+            background-color: #e8f6f3;
+            border-left: 5px solid #1abc9c;
+            color: #117a65;
+        }
+        .warning {
+            background-color: #fdebd0;
+            border-left: 5px solid #f39c12;
+            color: #b9770e;
+        }
+        .warning strong {
+            color: #925a09;
+        }
+
+
+        /* Footer */
+        footer {
+            background-color: #2c3e50; /* Blu scuro */
+            color: #ecf0f1; /* Grigio chiaro */
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 50px;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #bdc3c7; /* Grigio medio */
+        }
+        footer a {
+            color: #1abc9c;
+        }
+         /* Animazioni per GSAP - classi di utilità */
+        .gsap-reveal {
+            opacity: 0;
+            visibility: hidden; /* Nasconde prima dell'animazione */
+        }
+        .gsap-title-char {
+            display: inline-block; /* Per animare singole lettere */
+        }
+
+        /* Navbar (opzionale, ma può essere utile) */
+        nav {
+            background-color: rgba(44, 62, 80, 0.9); /* Blu scuro semi-trasparente */
+            padding: 1em 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5em 1em;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            background-color: #1abc9c;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="hero gsap-reveal">
+        <div class="container">
+            <h1 id="main-title"><span>Guida</span> <span>Stellare</span> <span>al</span> <span>Web</span> <span>Service</span> <span>REST</span></h1>
+            <p class="subtitle">
+                Costruisci passo-passo un'API Java per la manutenzione impianti gas, con stile, animazioni mozzafiato e la potenza di GSAP!
+            </p>
+            <a href="#introduction" class="cta-button">Inizia l'Avventura!</a>
+        </div>
+    </header>
+
+    <nav id="main-nav">
+        <div class="container">
+            <ul>
+                <li><a href="#introduction">Intro</a></li>
+                <li><a href="#prerequisites">Prerequisiti</a></li>
+                <li><a href="#database-setup">DB Setup</a></li>
+                <li><a href="#project-creation">Progetto</a></li>
+                <li><a href="#java-implementation">Codice Java</a></li>
+                <li><a href="#web-configuration">Config Web</a></li>
+                <li><a href="#build-deploy">Deploy</a></li>
+                <li><a href="#testing">Test</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section id="introduction" class="gsap-reveal">
+            <div class="container">
+                <h2>🚀 Benvenuti a Bordo!</h2>
+                <p>
+                    Ciao intrepidi sviluppatori! Preparatevi per un viaggio entusiasmante nel mondo dei <strong>Web Service REST</strong>. In questa guida super dettagliata, non solo impareremo a costruire un'API robusta e funzionale con Java, Maven, Servlet e JDBC per gestire la manutenzione di impianti gas, ma lo faremo con uno stile "fantastico" e animazioni che vi lasceranno a bocca aperta (grazie a GSAP!).
+                </p>
+                <p>
+                    L'obiettivo? Fornire ai tecnici manutentori un'APP (che userà questa API) per visualizzare gli impianti da revisionare in una data zona e per registrare le manutenzioni effettuate. Semplice nel concetto, potente nell'esecuzione!
+                </p>
+                <h4>Tecnologie che Useremo in questa Avventura:</h4>
+                <ul class="step-list">
+                    <li><strong>Java:</strong> Il cuore pulsante della nostra logica di backend.</li>
+                    <li><strong>Maven:</strong> Per gestire le dipendenze e il build del progetto come veri professionisti.</li>
+                    <li><strong>Jakarta EE (Servlet):</strong> Per creare i nostri endpoint HTTP RESTful.</li>
+                    <li><strong>JDBC:</strong> Per comunicare con il nostro database MySQL.</li>
+                    <li><strong>MySQL:</strong> Il database relazionale dove risiederanno i dati dei nostri impianti.</li>
+                    <li><strong>Jackson:</strong> Una libreria fantastica per convertire oggetti Java in JSON e viceversa.</li>
+                    <li><strong>HTML, CSS, JavaScript (con GSAP):</strong> Per questa guida interattiva e animata!</li>
+                    <li><strong>Tomcat (o simile):</strong> Il servlet container che ospiterà la nostra applicazione web.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="prerequisites" class="gsap-reveal">
+            <div class="container">
+                <h2>🛠️ Cassetta degli Attrezzi: I Prerequisiti</h2>
+                <p>Prima di sporcarci le mani con il codice, assicuriamoci di avere tutto il necessario installato e configurato sul nostro sistema. Ecco la lista della spesa:</p>
+                <div class="prerequisites-grid">
+                    <div class="prerequisite-card">
+                        <div class="icon">☕</div>
+                        <h4>JDK (Java Development Kit)</h4>
+                        <p>Versione 11 o superiore. È il motore della nostra applicazione.</p>
+                    </div>
+                    <div class="prerequisite-card">
+                        <div class="icon">🧱</div>
+                        <h4>Apache Maven</h4>
+                        <p>Versione 3.6 o superiore. Per gestire il progetto e le sue dipendenze.</p>
+                    </div>
+                    <div class="prerequisite-card">
+                        <div class="icon">🌐</div>
+                        <h4>Servlet Container</h4>
+                        <p>Apache Tomcat 10.x (o simile come Jetty, WildFly) che supporti Jakarta EE 9+.</p>
+                    </div>
+                    <div class="prerequisite-card">
+                        <div class="icon">🐬</div>
+                        <h4>MySQL Server & Workbench</h4>
+                        <p>Versione 8.x. Il nostro database. MySQL Workbench è un ottimo client grafico.</p>
+                    </div>
+                    <div class="prerequisite-card">
+                        <div class="icon">💻</div>
+                        <h4>IDE (Integrated Development Environment)</h4>
+                        <p>IntelliJ IDEA, Eclipse, o VS Code con estensioni Java. Scegli il tuo preferito!</p>
+                    </div>
+                    <div class="prerequisite-card">
+                        <div class="icon">🚀</div>
+                        <h4>Client HTTP (per Test)</h4>
+                        <p>Postman, Insomnia, o semplicemente `curl` da linea di comando.</p>
+                    </div>
+                </div>
+                <p class="note">
+                    Assicurati che i comandi `java`, `javac`, `mvn` e `mysql` siano accessibili dal tuo terminale/prompt dei comandi. Questo significa che le directory `bin` delle rispettive installazioni devono essere nel tuo PATH di sistema.
+                </p>
+            </div>
+        </section>
+
+        <section id="database-setup" class="gsap-reveal">
+            <div class="container">
+                <h2>🔩 Fase 1: Preparazione del Terreno - Il Database!</h2>
+                <p>
+                    Ogni grande applicazione ha bisogno di una solida base di dati. Iniziamo creando il nostro database <code>gas</code> e la tabella <code>impianto</code> che conterrà tutte le informazioni cruciali.
+                </p>
+                <h4>Script SQL per la Creazione:</h4>
+                <p>Apri MySQL Workbench (o il tuo client MySQL preferito) e lancia il seguente script SQL:</p>
+                <pre><code class="language-sql">
+CREATE DATABASE IF NOT EXISTS gas;
+USE gas;
+
+DROP TABLE IF EXISTS impianto; -- Utile se devi rieseguire lo script
+
+CREATE TABLE impianto (
+    codice INTEGER NOT NULL,
+    denominazione VARCHAR(64) NOT NULL,
+    latitudine FLOAT NOT NULL,
+    longitudine FLOAT NOT NULL,
+    stato_manutenzione CHAR(1) NOT NULL, -- 'N' = Non manutenuto, 'S' = Manutenzione Svoltan
+    data_ora DATETIME, -- Data e ora dell'avvenuta manutenzione
+    PRIMARY KEY (codice)
+);
+
+-- Inseriamo qualche dato di esempio per partire alla grande!
+INSERT INTO impianto(codice, denominazione, latitudine, longitudine, stato_manutenzione) VALUES(123, 'Livorno nord', 43.12, 10.51, 'N');
+INSERT INTO impianto(codice, denominazione, latitudine, longitudine, stato_manutenzione) VALUES(456, 'Livorno sud', 43.08, 10.49, 'N');
+INSERT INTO impianto(codice, denominazione, latitudine, longitudine, stato_manutenzione) VALUES(789, 'Livorno est', 43.10, 11.05, 'N');
+INSERT INTO impianto(codice, denominazione, latitudine, longitudine, stato_manutenzione, data_ora) VALUES(101, 'Pisa centro', 43.72, 10.40, 'S', '2024-05-10 10:30:00');
+INSERT INTO impianto(codice, denominazione, latitudine, longitudine, stato_manutenzione) VALUES(112, 'Firenze ovest', 43.77, 11.25, 'N');
+
+SELECT * FROM impianto; -- Verifica che tutto sia stato creato correttamente!
+                </code></pre>
+                <h4>Spiegazione dei Campi Chiave:</h4>
+                <ul class="step-list">
+                    <li><code>codice</code>: Identificativo univoco dell'impianto (INTEGER, PRIMARY KEY).</li>
+                    <li><code>denominazione</code>: Nome descrittivo dell'impianto (VARCHAR).</li>
+                    <li><code>latitudine</code>, <code>longitudine</code>: Coordinate geografiche (FLOAT).</li>
+                    <li><code>stato_manutenzione</code>: Un singolo carattere (CHAR(1)). Useremo 'N' per "Non manutenuto" e 'S' per "Manutenzione Svolta".</li>
+                    <li><code>data_ora</code>: Un campo DATETIME che verrà popolato con la data e l'ora esatta in cui la manutenzione viene registrata. Sarà <code>NULL</code> se <code>stato_manutenzione</code> è 'N'.</li>
+                </ul>
+                <p class="note">
+                    <strong>Consiglio da Pro:</strong> Assicurati che il tuo utente MySQL abbia i permessi necessari per creare database, tabelle e per eseguire operazioni di INSERT, SELECT, UPDATE sulla tabella <code>impianto</code>. Per lo sviluppo, spesso si usa l'utente `root`, ma in produzione è fondamentale creare un utente dedicato con privilegi minimi.
+                </p>
+            </div>
+        </section>
+
+        <section id="project-creation" class="gsap-reveal">
+            <div class="container">
+                <h2>🏗️ Fase 2: Le Fondamenta - Creazione del Progetto Maven</h2>
+                <p>
+                    Maven è il nostro fido assistente per costruire progetti Java. Ci aiuterà a gestire le dipendenze (le librerie esterne), a compilare il codice e a impacchettare la nostra applicazione in un file WAR (Web Application Archive) pronto per essere "schierato" (deployato) su Tomcat.
+                </p>
+                <h4>Struttura del Progetto</h4>
+                <p>Un tipico progetto web Maven segue una struttura di directory standard. Ecco come apparirà la nostra (<code>GasMaintenanceREST</code> è il nome della cartella principale del progetto):</p>
+                <pre><code class="language-text">
+GasMaintenanceREST/
+├── pom.xml  <-- Il cuore del nostro progetto Maven!
+├── src/
+│   ├── main/
+│   │   ├── java/  <-- Qui risiederà il nostro codice sorgente Java
+│   │   │   └── com/
+│   │   │       └── example/
+│   │   │           └── gas/
+│   │   │               ├── model/
+│   │   │               │   └── Impianto.java
+│   │   │               ├── servlet/
+│   │   │               │   └── ImpiantoServlet.java
+│   │   │               └── db/
+│   │   │                   └── DatabaseManager.java
+│   │   ├── webapp/  <-- Risorse web (HTML, CSS, JS se ne avessimo, e WEB-INF)
+│   │   │   ├── WEB-INF/
+│   │   │   │   └── web.xml  <-- Il descrittore di deployment della nostra web app
+│   │   │   └── META-INF/
+│   │   │       └── context.xml <-- (Opzionale, per Tomcat, per definire il context path)
+├── target/  <-- Directory generata da Maven (contiene il .war compilato)
+                </code></pre>
+                <p>Puoi creare questa struttura manualmente o usare un archetipo Maven se preferisci, ma per semplicità qui la assumiamo.</p>
+
+                <h3 id="pom-xml">📜 Il File `pom.xml` (Project Object Model)</h3>
+                <p>Questo file è fondamentale. Dice a Maven tutto sul nostro progetto: nome, versione, dipendenze, come fare il build, ecc. Crealo nella root del tuo progetto <code>GasMaintenanceREST/</code>.</p>
+                <pre><code class="language-xml">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>GasMaintenanceREST</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging> <!-- Importante: stiamo creando una Web Application -->
+
+    <name>GasMaintenanceREST Maven Webapp</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source> <!-- Versione Java -->
+        <maven.compiler.target>11</maven.compiler.target> <!-- Versione Java -->
+        <jakartaee.api.version>9.1.0</jakartaee.api.version> <!-- Per Servlet API 5.0 -->
+        <mysql.connector.version>8.0.33</mysql.connector.version>
+        <jackson.version>2.15.2</jackson.version>
+    </properties>
+
+    <dependencies>
+        <!-- Jakarta EE API (include Servlet, JSON Processing, etc.) -->
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>${jakartaee.api.version}</version>
+            <scope>provided</scope> <!-- Fornita dal server (Tomcat) -->
+        </dependency>
+
+        <!-- MySQL JDBC Driver -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.connector.version}</version>
+            <!-- Scope runtime: necessario solo durante l'esecuzione -->
+        </dependency>
+
+        <!-- Jackson per la (de)serializzazione JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!-- Modulo Jackson per tipi Java 8 Date/Time (es. LocalDateTime) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>GasMaintenanceAPI</finalName> <!-- Nome del file .war generato -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+                </code></pre>
+                <h4>Punti Chiave del `pom.xml`:</h4>
+                <ul class="step-list">
+                    <li><code><packaging>war</packaging></code>: Specifica che il risultato del build sarà un file WAR.</li>
+                    <li><code><properties>...</properties></code>: Definisce versioni comuni per le dipendenze e la versione Java.</li>
+                    <li><code><dependencies>...</dependencies></code>: Elenca le librerie di cui il nostro progetto ha bisogno.
+                        <ul>
+                            <li><strong>jakarta.jakartaee-api</strong>: Fornisce le API Servlet. Lo <code>scope</code> è <code>provided</code> perché il server Tomcat le fornirà già.</li>
+                            <li><strong>mysql-connector-j</strong>: Il driver JDBC per comunicare con MySQL. Sarà incluso nel nostro WAR.</li>
+                            <li><strong>jackson-databind</strong> e <strong>jackson-datatype-jsr310</strong>: Librerie per gestire facilmente la conversione tra oggetti Java e stringhe JSON (e viceversa), essenziale per un'API REST.</li>
+                        </ul>
+                    </li>
+                    <li><code><build>...</build></code>: Contiene configurazioni per il processo di build, come il nome finale del WAR (<code>GasMaintenanceAPI.war</code>) e i plugin usati (<code>maven-war-plugin</code>, <code>maven-compiler-plugin</code>).</li>
+                </ul>
+                <p class="note">Dopo aver creato il <code>pom.xml</code>, puoi aprire il progetto con il tuo IDE preferito (IntelliJ IDEA, Eclipse). L'IDE dovrebbe riconoscere che è un progetto Maven e scaricare automaticamente le dipendenze definite.</p>
+            </div>
+        </section>
+
+        <section id="java-implementation" class="gsap-reveal">
+            <div class="container">
+                <h2>💻 Fase 3: Scriviamo il Codice Java!</h2>
+                <p>È il momento di dare vita alla nostra API! Creeremo tre classi Java principali all'interno della cartella <code>src/main/java/com/example/gas/</code>.</p>
+
+                <h3 id="model-class">📦 `model/Impianto.java` - Il Nostro Modello Dati</h3>
+                <p>Questa classe (un POJO - Plain Old Java Object) rappresenta un singolo impianto. Corrisponderà alla struttura della nostra tabella del database e verrà usata per trasportare i dati e convertirli in JSON.</p>
+                <pre><code class="language-java">
+package com.example.gas.model;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+
+// Non includere campi null nel JSON risultante (es. dataOra se l'impianto non è manutenuto)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Impianto {
+    private int codice;
+    private String denominazione;
+    private double latitudine;
+    private double longitudine;
+    private char statoManutenzione; // 'N' o 'S'
+
+    // Formatta LocalDateTime come stringa ISO 8601 nel JSON
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime dataOra;
+
+    // Costruttore vuoto (necessario per alcune librerie come Jackson)
+    public Impianto() {}
+
+    // Costruttore con tutti i campi (utile per creare istanze)
+    public Impianto(int codice, String denominazione, double latitudine, double longitudine, char statoManutenzione, LocalDateTime dataOra) {
+        this.codice = codice;
+        this.denominazione = denominazione;
+        this.latitudine = latitudine;
+        this.longitudine = longitudine;
+        this.statoManutenzione = statoManutenzione;
+        this.dataOra = dataOra;
+    }
+
+    // Getter e Setter per tutti i campi...
+    public int getCodice() { return codice; }
+    public void setCodice(int codice) { this.codice = codice; }
+
+    public String getDenominazione() { return denominazione; }
+    public void setDenominazione(String denominazione) { this.denominazione = denominazione; }
+
+    public double getLatitudine() { return latitudine; }
+    public void setLatitudine(double latitudine) { this.latitudine = latitudine; }
+
+    public double getLongitudine() { return longitudine; }
+    public void setLongitudine(double longitudine) { this.longitudine = longitudine; }
+
+    public char getStatoManutenzione() { return statoManutenzione; }
+    public void setStatoManutenzione(char statoManutenzione) { this.statoManutenzione = statoManutenzione; }
+
+    public LocalDateTime getDataOra() { return dataOra; }
+    public void setDataOra(LocalDateTime dataOra) { this.dataOra = dataOra; }
+
+    @Override
+    public String toString() { // Utile per il debugging
+        return "Impianto{" +
+                "codice=" + codice +
+                ", denominazione='" + denominazione + '\'' +
+                ", latitudine=" + latitudine +
+                ", longitudine=" + longitudine +
+                ", statoManutenzione=" + statoManutenzione +
+                ", dataOra=" + dataOra +
+                '}';
+    }
+}
+                </code></pre>
+                <p><strong>Annotazioni Jackson Chiave:</strong></p>
+                <ul class="step-list">
+                    <li><code>@JsonInclude(JsonInclude.Include.NON_NULL)</code>: Se un campo è <code>null</code> (come <code>dataOra</code> per impianti non manutenuti), non verrà incluso nel JSON generato. Mantiene il JSON pulito!</li>
+                    <li><code>@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")</code>: Dice a Jackson come formattare il campo <code>LocalDateTime</code> quando lo converte in una stringa JSON (e viceversa, se dovessimo deserializzare).</li>
+                </ul>
+
+                <h3 id="dbmanager-class">🔗 `db/DatabaseManager.java` - Il Gestore della Connessione</h3>
+                <p>Questa classe helper si occuperà di stabilire la connessione al database. Incapsula la logica di connessione rendendo il servlet più pulito.</p>
+                <pre><code class="language-java">
+package com.example.gas.db;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DatabaseManager {
+    private static String dbUrl;
+    private static String dbUser;
+    private static String dbPassword;
+    private static boolean driverLoaded = false;
+
+    // Metodo per inizializzare i parametri di connessione (chiamato dalla Servlet)
+    public static synchronized void init(String url, String user, String password) {
+        if (dbUrl == null) { // Inizializza solo una volta
+            dbUrl = url;
+            dbUser = user;
+            dbPassword = password;
+            loadDriver();
+        }
+    }
+
+    private static void loadDriver() {
+        if (!driverLoaded) {
+            try {
+                // Carica esplicitamente il driver MySQL JDBC
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                driverLoaded = true;
+                System.out.println("MySQL JDBC Driver caricato con successo.");
+            } catch (ClassNotFoundException e) {
+                System.err.println("ERRORE CRITICO: MySQL JDBC Driver non trovato! Assicurati che sia nel classpath.");
+                // Potresti voler lanciare una RuntimeException qui per bloccare l'avvio dell'app
+                // throw new RuntimeException("MySQL JDBC Driver non trovato.", e);
+            }
+        }
+    }
+
+    public static Connection getConnection() throws SQLException {
+        if (dbUrl == null || !driverLoaded) {
+            // Questo scenario dovrebbe essere evitato da una corretta inizializzazione
+            System.err.println("DatabaseManager non inizializzato correttamente o driver non caricato.");
+            throw new SQLException("DatabaseManager non inizializzato o driver JDBC non caricato.");
+        }
+        return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+    }
+}
+                </code></pre>
+                <p><strong>Punti Importanti:</strong></p>
+                <ul class="step-list">
+                    <li>Il metodo <code>init()</code> verrà chiamato una sola volta all'avvio della servlet per caricare i parametri di connessione dal <code>web.xml</code>.</li>
+                    <li><code>Class.forName("com.mysql.cj.jdbc.Driver");</code> carica esplicitamente il driver JDBC di MySQL. Questo è un passaggio importante.</li>
+                    <li><code>getConnection()</code> fornisce una nuova connessione al database ogni volta che viene chiamata.</li>
+                </ul>
+
+                <h3 id="servlet-class">🚀 `servlet/ImpiantoServlet.java` - Il Cervello della Nostra API!</h3>
+                <p>Questa è la classe più importante. Estende <code>HttpServlet</code> e gestirà le richieste HTTP in arrivo, interagirà con il database e invierà risposte JSON.</p>
+                <div class="warning">
+                    <strong>Attenzione:</strong> Il seguente codice è abbastanza lungo. Prenditi il tuo tempo per analizzarlo sezione per sezione!
+                </div>
+                <pre><code class="language-java">
+package com.example.gas.servlet;
+
+import com.example.gas.db.DatabaseManager;
+import com.example.gas.model.Impianto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ImpiantoServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private ObjectMapper objectMapper; // Per la conversione Java <-> JSON
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        // Inizializza il DatabaseManager con i parametri dal web.xml
+        DatabaseManager.init(
+                config.getServletContext().getInitParameter("dbUrl"),
+                config.getServletContext().getInitParameter("dbUser"),
+                config.getServletContext().getInitParameter("dbPassword")
+        );
+        // Inizializza ObjectMapper e registra il modulo per LocalDateTime
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        System.out.println("ImpiantoServlet inizializzata con successo!");
+    }
+
+    // Gestisce le richieste GET
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+
+        // Endpoint: /impianti/da-manutenere?latMin=...&latMax=...&lonMin=...&lonMax=...
+        if (pathInfo != null && pathInfo.equals("/da-manutenere")) {
+            handleGetImpiantiDaManutenere(req, resp);
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Endpoint GET non valido o non supportato. Usa /da-manutenere con i parametri corretti.");
+        }
+    }
+
+    private void handleGetImpiantiDaManutenere(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // Estrazione e validazione parametri query
+        String latMinStr = req.getParameter("latMin");
+        String latMaxStr = req.getParameter("latMax");
+        String lonMinStr = req.getParameter("lonMin");
+        String lonMaxStr = req.getParameter("lonMax");
+
+        if (latMinStr == null || latMaxStr == null || lonMinStr == null || lonMaxStr == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parametri mancanti: latMin, latMax, lonMin, lonMax sono tutti obbligatori.");
+            return;
+        }
+
+        try {
+            double latMin = Double.parseDouble(latMinStr);
+            double latMax = Double.parseDouble(latMaxStr);
+            double lonMin = Double.parseDouble(lonMinStr);
+            double lonMax = Double.parseDouble(lonMaxStr);
+
+            if (latMin > latMax || lonMin > lonMax) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Logica parametri errata: latMin non può essere maggiore di latMax (e simile per lon).");
+                return;
+            }
+
+            List<Impianto> impianti = new ArrayList<>();
+            String sql = "SELECT codice, denominazione, latitudine, longitudine, stato_manutenzione, data_ora " +
+                         "FROM impianto " +
+                         "WHERE stato_manutenzione = 'N' " + // Solo impianti non manutenuti
+                         "AND latitudine BETWEEN ? AND ? " +
+                         "AND longitudine BETWEEN ? AND ?";
+
+            // Try-with-resources per chiudere automaticamente Connection e PreparedStatement
+            try (Connection conn = DatabaseManager.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                pstmt.setDouble(1, latMin);
+                pstmt.setDouble(2, latMax);
+                pstmt.setDouble(3, lonMin);
+                pstmt.setDouble(4, lonMax);
+
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    Impianto impianto = new Impianto();
+                    impianto.setCodice(rs.getInt("codice"));
+                    impianto.setDenominazione(rs.getString("denominazione"));
+                    impianto.setLatitudine(rs.getDouble("latitudine"));
+                    impianto.setLongitudine(rs.getDouble("longitudine"));
+                    impianto.setStatoManutenzione(rs.getString("stato_manutenzione").charAt(0));
+                    
+                    Timestamp dataOraTs = rs.getTimestamp("data_ora");
+                    if (dataOraTs != null) { // data_ora può essere NULL
+                        impianto.setDataOra(dataOraTs.toLocalDateTime());
+                    } else {
+                        impianto.setDataOra(null);
+                    }
+                    impianti.add(impianto);
+                }
+            } // conn e pstmt chiusi qui
+
+            // Imposta il tipo di contenuto della risposta a JSON
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            // Scrive la lista di impianti come JSON nello stream di output della risposta
+            objectMapper.writeValue(resp.getOutputStream(), impianti);
+
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parametri di latitudine/longitudine non validi: devono essere numeri corretti.");
+        } catch (SQLException e) {
+            System.err.println("Errore SQL in handleGetImpiantiDaManutenere: " + e.getMessage());
+            e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Errore durante l'accesso al database: " + e.getMessage());
+        }
+    }
+
+    // Gestisce le richieste PUT
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo(); // Es. "/123/manutenzione-completata"
+
+        if (pathInfo != null) {
+            //  pathInfo inizia con "/", quindi parts[0] è vuoto
+            //  parts[1] è {codiceImpianto}
+            //  parts[2] è "manutenzione-completata"
+            String[] parts = pathInfo.split("/");
+            if (parts.length == 3 && "manutenzione-completata".equals(parts[2])) {
+                try {
+                    int codiceImpianto = Integer.parseInt(parts[1]);
+                    handlePutManutenzioneCompletata(codiceImpianto, resp);
+                } catch (NumberFormatException e) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Codice impianto nell'URL non valido: deve essere un numero.");
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Endpoint PUT non valido. Formato atteso: /impianti/{codice}/manutenzione-completata");
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Endpoint PUT non specificato.");
+        }
+    }
+
+    private void handlePutManutenzioneCompletata(int codiceImpianto, HttpServletResponse resp) throws IOException {
+        String checkSql = "SELECT stato_manutenzione FROM impianto WHERE codice = ?";
+        String updateSql = "UPDATE impianto SET stato_manutenzione = 'S', data_ora = NOW() " +
+                           "WHERE codice = ? AND stato_manutenzione = 'N'"; // Aggiorna solo se 'N'
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(false); // Iniziamo una transazione (opzionale ma buona pratica)
+
+            // 1. Controlla se l'impianto esiste e se è già manutenuto
+            char statoAttuale = ' ';
+            boolean impiantoEsiste = false;
+            try (PreparedStatement checkPstmt = conn.prepareStatement(checkSql)) {
+                checkPstmt.setInt(1, codiceImpianto);
+                ResultSet rs = checkPstmt.executeQuery();
+                if (rs.next()) {
+                    impiantoEsiste = true;
+                    statoAttuale = rs.getString("stato_manutenzione").charAt(0);
+                }
+            } // checkPstmt chiuso qui
+
+            if (!impiantoEsiste) {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Impianto con codice " + codiceImpianto + " non trovato.");
+                conn.rollback(); // Annulla transazione
+                return;
+            }
+
+            if (statoAttuale == 'S') {
+                resp.sendError(HttpServletResponse.SC_CONFLICT, "Impianto con codice " + codiceImpianto + " risulta già manutenuto.");
+                conn.rollback(); // Annulla transazione
+                return;
+            }
+
+            // 2. Esegui l'aggiornamento
+            int rowsAffected = 0;
+            try (PreparedStatement updatePstmt = conn.prepareStatement(updateSql)) {
+                updatePstmt.setInt(1, codiceImpianto);
+                rowsAffected = updatePstmt.executeUpdate();
+            } // updatePstmt chiuso qui
+
+            if (rowsAffected > 0) {
+                conn.commit(); // Conferma transazione
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT); // Successo, nessun contenuto da restituire
+                System.out.println("Manutenzione registrata per impianto: " + codiceImpianto);
+            } else {
+                // Questo potrebbe accadere se lo stato è cambiato tra il check e l'update (race condition)
+                // o se l'impianto è stato cancellato.
+                conn.rollback(); // Annulla transazione
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile aggiornare l'impianto. Potrebbe essere già stato aggiornato o non trovato.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Errore SQL in handlePutManutenzioneCompletata: " + e.getMessage());
+            e.printStackTrace();
+            // Se c'è un errore SQL, la transazione (se autoCommit=false) dovrebbe essere annullata dal DB
+            // o si potrebbe tentare un rollback esplicito qui, ma potrebbe fallire.
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Errore durante l'aggiornamento del database: " + e.getMessage());
+        }
+    }
+}
+                </code></pre>
+                <h4>Logica Chiave della Servlet:</h4>
+                <ul class="step-list">
+                    <li><strong>`init()`:</strong> Viene chiamato una volta quando la servlet viene caricata. Inizializza il <code>DatabaseManager</code> (passandogli i parametri di connessione letti dal `web.xml`) e l'<code>ObjectMapper</code> di Jackson (per la conversione JSON).</li>
+                    <li><strong>`doGet()`:</strong> Gestisce le richieste HTTP GET.
+                        <ul>
+                            <li>Controlla il <code>pathInfo</code> (la parte dell'URL dopo il mapping della servlet).</li>
+                            <li>Se il path è <code>/da-manutenere</code>, chiama <code>handleGetImpiantiDaManutenere()</code>.</li>
+                            <li><code>handleGetImpiantiDaManutenere()</code>:
+                                <ul>
+                                    <li>Estrae e valida i parametri query (<code>latMin</code>, <code>latMax</code>, ecc.).</li>
+                                    <li>Costruisce ed esegue una query SQL per trovare gli impianti con <code>stato_manutenzione = 'N'</code> all'interno delle coordinate specificate.</li>
+                                    <li>Usa un <code>PreparedStatement</code> per prevenire SQL Injection.</li>
+                                    <li>Converte i risultati del database in una lista di oggetti <code>Impianto</code>.</li>
+                                    <li>Usa <code>objectMapper.writeValue()</code> per convertire la lista in una stringa JSON e inviarla come risposta.</li>
+                                    <li>Gestisce errori (parametri non validi, errori SQL) inviando codici di stato HTTP appropriati.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>`doPut()`:</strong> Gestisce le richieste HTTP PUT.
+                        <ul>
+                            <li>Analizza il <code>pathInfo</code> per estrarre il <code>{codiceImpianto}</code> dall'URL (es. <code>/123/manutenzione-completata</code>).</li>
+                            <li>Se l'URL corrisponde al formato atteso, chiama <code>handlePutManutenzioneCompletata()</code>.</li>
+                            <li><code>handlePutManutenzioneCompletata()</code>:
+                                <ul>
+                                    <li>Prima controlla se l'impianto esiste e se non è già manutenuto (stato 'N'). Questo previene aggiornamenti inutili e fornisce feedback specifico.</li>
+                                    <li>Se tutto è ok, esegue un comando SQL UPDATE per impostare <code>stato_manutenzione = 'S'</code> e <code>data_ora = NOW()</code> (la data/ora corrente del server DB).</li>
+                                    <li>Restituisce uno stato <code>204 No Content</code> in caso di successo, come da prassi REST per le operazioni PUT che modificano una risorsa senza restituire dati.</li>
+                                    <li>Gestisce errori (impianto non trovato, già manutenuto, errori SQL) con codici di stato HTTP appropriati.</li>
+                                    <li>(Opzionale ma consigliato) Usa una transazione (<code>conn.setAutoCommit(false)</code>, <code>commit()</code>, <code>rollback()</code>) per assicurare che il controllo e l'aggiornamento siano atomici.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="web-configuration" class="gsap-reveal">
+            <div class="container">
+                <h2>⚙️ Fase 4: Configurazione Web - `web.xml` e `context.xml`</h2>
+                <p>
+                    Ora dobbiamo dire al nostro server (Tomcat) come gestire la nostra applicazione. Lo faremo principalmente attraverso il file <code>web.xml</code>.
+                </p>
+
+                <h3>📜 `src/main/webapp/WEB-INF/web.xml` - Il Descrittore di Deployment</h3>
+                <p>Questo file è il "manuale di istruzioni" per il servlet container. Specifica quale servlet gestisce quali URL, i parametri di inizializzazione, ecc.</p>
+                <pre><code class="language-xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <display-name>GasMaintenanceAPI</display-name> <!-- Nome visualizzato dell'app -->
+
+    <!-- Definizione della nostra Servlet -->
+    <servlet>
+        <servlet-name>ImpiantoServlet</servlet-name>
+        <servlet-class>com.example.gas.servlet.ImpiantoServlet</servlet-class>
+        <!-- <load-on-startup>1</load-on-startup> --> <!-- Opzionale: carica la servlet all'avvio del server -->
+    </servlet>
+
+    <!-- Mapping della Servlet agli URL -->
+    <servlet-mapping>
+        <servlet-name>ImpiantoServlet</servlet-name>
+        <!-- Tutte le richieste che iniziano con /GasMaintenanceAPI/impianti/ saranno gestite da ImpiantoServlet -->
+        <url-pattern>/impianti/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Parametri di contesto per la connessione al Database -->
+    <!-- Questi valori saranno letti dalla Servlet nel metodo init() -->
+    <context-param>
+        <param-name>dbUrl</param-name>
+        <param-value>jdbc:mysql://localhost:3306/gas?serverTimezone=UTC</param-value> <!-- Aggiunto serverTimezone per evitare problemi -->
+    </context-param>
+    <context-param>
+        <param-name>dbUser</param-name>
+        <param-value>root</param-value> <!-- CAMBIA SE NECESSARIO -->
+    </context-param>
+    <context-param>
+        <param-name>dbPassword</param-name>
+        <param-value>laTuaPasswordSuperSegreta</param-value> <!-- !!! CAMBIARE ASSOLUTAMENTE QUESTA PASSWORD !!! -->
+    </context-param>
+
+    <!-- Configurazione della sessione (non strettamente necessaria per questa API REST stateless) -->
+    <session-config>
+        <session-timeout>30</session-timeout> <!-- Timeout in minuti -->
+    </session-config>
+
+</web-app>
+                </code></pre>
+                <h4>Analisi del `web.xml`:</h4>
+                <ul class="step-list">
+                    <li><code><servlet></code>: Definisce la nostra servlet.
+                        <ul>
+                            <li><code><servlet-name></code>: Un nome logico per la servlet (<code>ImpiantoServlet</code>).</li>
+                            <li><code><servlet-class></code>: Il percorso completo della classe Java della servlet (<code>com.example.gas.servlet.ImpiantoServlet</code>).</li>
+                            <li><code><load-on-startup>1</load-on-startup></code> (commentato): Se presente e > 0, dice al server di caricare e inizializzare la servlet all'avvio, invece di aspettare la prima richiesta. Utile per eseguire codice di inizializzazione (come il nostro <code>DatabaseManager.init()</code>) subito.</li>
+                        </ul>
+                    </li>
+                    <li><code><servlet-mapping></code>: Associa la servlet (tramite <code><servlet-name></code>) a uno o più pattern URL.
+                        <ul>
+                            <li><code><url-pattern>/impianti/*</url-pattern></code>: Significa che qualsiasi richiesta il cui percorso inizi con <code>/impianti/</code> (relativo al context path dell'applicazione) verrà gestita da <code>ImpiantoServlet</code>. Il <code>*</code> è un wildcard. Ad esempio:
+                                <ul>
+                                    <li><code>http://localhost:8080/GasMaintenanceAPI/impianti/da-manutenere</code></li>
+                                    <li><code>http://localhost:8080/GasMaintenanceAPI/impianti/123/manutenzione-completata</code></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><code><context-param></code>: Definisce i parametri di inizializzazione a livello di contesto dell'applicazione. Questi sono accessibili da tutte le servlet. Li usiamo per la configurazione del database.
+                        <ul>
+                            <li><code>param-value</code> per <code>dbUrl</code>: Nota l'aggiunta di <code>?serverTimezone=UTC</code>. È spesso necessario con i driver MySQL recenti per evitare problemi di timezone. Adattalo se il tuo server DB usa un timezone diverso o se il driver non lo richiede.</li>
+                            <li><strong>IMPORTANTE:</strong> La password del database (<code>dbPassword</code>) è in chiaro nel <code>web.xml</code>. Questo è accettabile <strong>solo per lo sviluppo locale</strong>. Per ambienti di produzione, usa meccanismi più sicuri come JNDI DataSources configurati nel server Tomcat, variabili d'ambiente o file di configurazione esterni protetti.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>📜 `src/main/webapp/META-INF/context.xml` (Opzionale, specifico per Tomcat)</h3>
+                <p>
+                    Questo file, se presente, viene utilizzato da Tomcat per configurare il "context path" della tua applicazione. Il context path è la parte dell'URL che viene dopo il nome dell'host e la porta, e identifica la tua applicazione (es. <code>/GasMaintenanceAPI</code>).
+                </p>
+                <p>Se non crei questo file, Tomcat userà di default il nome del file WAR (che abbiamo impostato a <code>GasMaintenanceAPI</code> nel <code>pom.xml</code>) come context path (quindi <code>/GasMaintenanceAPI</code>).</p>
+                <pre><code class="language-xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/GasMaintenanceAPI">
+    <!-- Qui potresti anche configurare un JNDI DataSource per il database,
+         che è un approccio più robusto e sicuro per la gestione delle connessioni in produzione.
+    <Resource name="jdbc/GasDB" auth="Container" type="javax.sql.DataSource"
+               maxTotal="100" maxIdle="30" maxWaitMillis="10000"
+               username="tuo_utente_db" password="tua_password_db"
+               driverClassName="com.mysql.cj.jdbc.Driver"
+               url="jdbc:mysql://localhost:3306/gas?serverTimezone=UTC"/>
+    -->
+</Context>
+                </code></pre>
+                <p class="note">Per questa guida, l'uso di <code>context.xml</code> è opzionale, ma è bene conoscerlo. Il commento mostra come potresti iniziare a definire un DataSource JNDI, un argomento più avanzato ma molto importante per applicazioni reali.</p>
+            </div>
+        </section>
+
+        <section id="build-deploy" class="gsap-reveal">
+            <div class="container">
+                <h2>🚀 Fase 5: Decollo! Build e Deploy dell'Applicazione</h2>
+                <p>Abbiamo scritto il codice, configurato tutto. Ora è il momento di impacchettare la nostra applicazione e lanciarla sul server Tomcat!</p>
+
+                <h4>1. Build con Maven</h4>
+                <p>Apri il terminale o il prompt dei comandi, naviga nella directory principale del tuo progetto (<code>GasMaintenanceREST/</code>, dove si trova il <code>pom.xml</code>) ed esegui il comando Maven magico:</p>
+                <pre><code class="language-bash">
+mvn clean package
+                </code></pre>
+                <p>Cosa fa questo comando?</p>
+                <ul class="step-list">
+                    <li><strong><code>clean</code></strong>: Pulisce la directory <code>target/</code>, rimuovendo eventuali artefatti di build precedenti. Buona pratica per evitare problemi.</li>
+                    <li><strong><code>package</code></strong>: Compila il codice sorgente, esegue i test (se ne avessimo definiti), e impacchetta l'applicazione nel formato specificato nel <code>pom.xml</code> (nel nostro caso, un file <code>.war</code>).</li>
+                </ul>
+                <p>Se tutto va bene, vedrai un messaggio <code>[INFO] BUILD SUCCESS</code>. Troverai il file <code>GasMaintenanceAPI.war</code> dentro la directory <code>target/</code>.</p>
+
+                <h4>2. Deploy su Apache Tomcat</h4>
+                <p>Ci sono diversi modi per fare il deploy di un file <code>.war</code> su Tomcat. Ecco il più semplice per lo sviluppo:</p>
+                <ol class="step-list">
+                    <li><strong>Avvia Tomcat:</strong> Assicurati che il tuo server Tomcat sia in esecuzione. Di solito, puoi avviarlo eseguendo lo script <code>startup.sh</code> (su Linux/macOS) o <code>startup.bat</code> (su Windows) che si trova nella directory <code>bin/</code> della tua installazione di Tomcat.</li>
+                    <li><strong>Copia il File WAR:</strong> Prendi il file <code>GasMaintenanceAPI.war</code> dalla directory <code>target/</code> del tuo progetto e copialo nella directory <code>webapps/</code> della tua installazione di Tomcat.</li>
+                </ol>
+                <p>Tomcat monitora la directory <code>webapps/</code>. Quando rileva un nuovo file <code>.war</code>, lo "esploderà" automaticamente (cioè, lo decomprimerà in una directory con lo stesso nome del WAR senza l'estensione) e renderà l'applicazione disponibile.</p>
+                <p class="note">
+                    Dopo il deploy, la tua applicazione dovrebbe essere accessibile all'URL: <code>http://localhost:8080/GasMaintenanceAPI/</code> (supponendo che Tomcat sia in esecuzione sulla porta 8080 e il context path sia <code>GasMaintenanceAPI</code>). Gli endpoint della nostra API saranno quindi sotto <code>http://localhost:8080/GasMaintenanceAPI/impianti/...</code>.
+                </p>
+                <h4>Verifica i Log di Tomcat</h4>
+                <p>
+                    È sempre una buona idea controllare i file di log di Tomcat (che di solito si trovano nella directory <code>logs/</code> di Tomcat, in particolare <code>catalina.out</code> o i log specifici dell'applicazione) per eventuali errori durante l'avvio o il deploy. Dovresti vedere messaggi come "ImpiantoServlet inizializzata con successo!" se tutto è andato per il verso giusto.
+                </p>
+            </div>
+        </section>
+
+        <section id="testing" class="gsap-reveal">
+            <div class="container">
+                <h2>🔬 Fase 6: Mettiamo alla Prova l'API!</h2>
+                <p>La nostra API è ora in esecuzione! È il momento di testare i suoi endpoint per assicurarci che funzioni come previsto. Useremo <code>curl</code> per esempi da linea di comando, ma puoi usare anche strumenti grafici come Postman o Insomnia.</p>
+                <p class="note">Assicurati di aver inserito dei dati di esempio nel database come mostrato nella Fase 1, o gli endpoint GET potrebbero restituire liste vuote.</p>
+
+                <h3>Endpoint 1: Ottenere Impianti da Manutenere per Zona</h3>
+                <p><strong>Metodo:</strong> GET<br>
+                   <strong>URL:</strong> <code>http://localhost:8080/GasMaintenanceAPI/impianti/da-manutenere</code><br>
+                   <strong>Parametri Query:</strong> <code>latMin</code>, <code>latMax</code>, <code>lonMin</code>, <code>lonMax</code>
+                </p>
+
+                <h4>Esempio con `curl`:</h4>
+                <p>Apri il terminale e prova questo comando (adatta i valori delle coordinate se necessario per includere i tuoi dati di esempio):</p>
+                <pre><code class="language-bash">
+curl -X GET "http://localhost:8080/GasMaintenanceAPI/impianti/da-manutenere?latMin=43.0&latMax=43.8&lonMin=10.0&lonMax=11.5"
+                </code></pre>
+                <h4>Risposta Attesa (Esempio):</h4>
+                <p>Se ci sono impianti non manutenuti ('N') nella zona specificata, dovresti ricevere una risposta JSON simile a questa:</p>
+                <pre><code class="language-json">
+[
+    {
+        "codice": 123,
+        "denominazione": "Livorno nord",
+        "latitudine": 43.12,
+        "longitudine": 10.51,
+        "statoManutenzione": "N"
+        // "dataOra" non è presente perché null (grazie a @JsonInclude(JsonInclude.Include.NON_NULL))
+    },
+    {
+        "codice": 456,
+        "denominazione": "Livorno sud",
+        "latitudine": 43.08,
+        "longitudine": 10.49,
+        "statoManutenzione": "N"
+    },
+    {
+        "codice": 112,
+        "denominazione": "Firenze ovest",
+        "latitudine": 43.77,
+        "longitudine": 11.25,
+        "statoManutenzione": "N"
+    }
+    // ... altri impianti che soddisfano i criteri
+]
+                </code></pre>
+                <p>Se non ci sono impianti corrispondenti, riceverai un array JSON vuoto: <code>[]</code>.</p>
+                <h4>Test Casi Limite:</h4>
+                <ul class="step-list">
+                    <li><strong>Parametri mancanti:</strong> Prova a omettere un parametro (es. `latMin`). Dovresti ricevere un errore `400 Bad Request`.
+                        <pre><code class="language-bash">curl -i -X GET "http://localhost:8080/GasMaintenanceAPI/impianti/da-manutenere?latMax=43.8&lonMin=10.0&lonMax=11.5"</code></pre>
+                    </li>
+                    <li><strong>Parametri non numerici:</strong> Prova a inviare `latMin=abc`. Dovresti ricevere un `400 Bad Request`.</li>
+                    <li><strong>Logica min/max errata:</strong> Prova `latMin=44.0&latMax=43.0`. Dovresti ricevere un `400 Bad Request`.</li>
+                </ul>
+
+                <h3>Endpoint 2: Registrare Manutenzione Completata</h3>
+                <p><strong>Metodo:</strong> PUT<br>
+                   <strong>URL:</strong> <code>http://localhost:8080/GasMaintenanceAPI/impianti/{codiceImpianto}/manutenzione-completata</code>
+                </p>
+                <h4>Esempio con `curl` (per l'impianto con codice 123):</h4>
+                <pre><code class="language-bash">
+curl -X PUT http://localhost:8080/GasMaintenanceAPI/impianti/123/manutenzione-completata -i
+                </code></pre>
+                <p>(L'opzione <code>-i</code> mostra gli header della risposta, così puoi vedere il codice di stato).</p>
+                <h4>Risposta Attesa:</h4>
+                <ul class="step-list">
+                    <li><strong>Successo (impianto 123 era 'N'):</strong> Codice di stato <code>HTTP/1.1 204 No Content</code>. Nessun corpo nella risposta. Puoi verificare nel database che l'impianto 123 ora ha <code>stato_manutenzione = 'S'</code> e il campo <code>data_ora</code> è popolato.</li>
+                    <li><strong>Impianto non trovato:</strong> Se provi con un codice non esistente (es. 9999): Codice di stato <code>HTTP/1.1 404 Not Found</code>.</li>
+                    <li><strong>Impianto già manutenuto:</strong> Se riprovi a eseguire il PUT sull'impianto 123 (che ora è 'S'): Codice di stato <code>HTTP/1.1 409 Conflict</code>.</li>
+                    <li><strong>Codice impianto non valido nell'URL:</strong> Es. <code>/abc/manutenzione-completata</code>. Codice di stato <code>HTTP/1.1 400 Bad Request</code>.</li>
+                </ul>
+
+                <h4>Usare Postman (Alternativa Grafica)</h4>
+                <p>
+                    Postman è uno strumento eccellente per testare API REST.
+                </p>
+                <ol>
+                    <li><strong>Per il GET:</strong>
+                        <ul>
+                            <li>Seleziona il metodo GET.</li>
+                            <li>Inserisci l'URL: <code>http://localhost:8080/GasMaintenanceAPI/impianti/da-manutenere</code></li>
+                            <li>Vai alla tab "Params" e aggiungi le chiavi <code>latMin</code>, <code>latMax</code>, <code>lonMin</code>, <code>lonMax</code> con i rispettivi valori.</li>
+                            <li>Clicca "Send". Vedrai la risposta JSON nel corpo.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Per il PUT:</strong>
+                        <ul>
+                            <li>Seleziona il metodo PUT.</li>
+                            <li>Inserisci l'URL: <code>http://localhost:8080/GasMaintenanceAPI/impianti/123/manutenzione-completata</code> (sostituisci 123 con il codice desiderato).</li>
+                            <li>Non c'è bisogno di un body per questa richiesta.</li>
+                            <li>Clicca "Send". Controlla il codice di stato nella risposta.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="note">
+                    Esplora i log di Tomcat (<code>logs/catalina.out</code> o simili) e i log della tua servlet (output su console) mentre testi. Possono fornire informazioni preziose in caso di problemi!
+                </p>
+            </div>
+        </section>
+
+        <section id="conclusion" class="gsap-reveal">
+            <div class="container">
+                <h2>🎉 Missione Compiuta... e Oltre!</h2>
+                <p>
+                    Congratulazioni, Comandante! Hai navigato con successo attraverso la creazione di un Web Service REST completo, dalla configurazione del database al deploy e al testing. Hai ora tra le mani un'API funzionante che può essere la base per un'applicazione di manutenzione impianti gas!
+                </p>
+                <h4>Cosa Abbiamo Imparato (e Costruito!):</h4>
+                <ul class="step-list">
+                    <li>A progettare una semplice ma efficace <strong>Web API REST</strong>.</li>
+                    <li>A strutturare un progetto web Java con <strong>Maven</strong>.</li>
+                    <li>A creare <strong>Servlet</strong> per gestire richieste HTTP (GET e PUT).</li>
+                    <li>A interagire con un database <strong>MySQL</strong> usando <strong>JDBC</strong> e <code>PreparedStatement</code>.</li>
+                    <li>A gestire la conversione da/per <strong>JSON</strong> con la libreria <strong>Jackson</strong>.</li>
+                    <li>A configurare una web application tramite <code>web.xml</code>.</li>
+                    <li>A fare il build e il deploy di un file <strong>WAR</strong> su <strong>Tomcat</strong>.</li>
+                    <li>A testare gli endpoint REST con strumenti come <code>curl</code> o Postman.</li>
+                </ul>
+                <h4>Prossimi Passi e Possibili Miglioramenti Galattici:</h4>
+                <p>Questo progetto è una base solida. Ecco alcune idee per espanderlo e renderlo ancora più "stellare":</p>
+                <ul class="step-list">
+                    <li><strong>Gestione Errori Avanzata:</strong> Implementare una gestione degli errori più strutturata, magari con classi di eccezione personalizzate e risposte JSON standard per gli errori.</li>
+                    <li><strong>Validazione Input:</strong> Aggiungere una validazione più robusta per tutti i parametri di input (es. range per lat/lon, formati). Framework come Bean Validation (JSR 380) possono aiutare.</li>
+                    <li><strong>Sicurezza:</strong> Ah, la sicurezza! Argomento vastissimo. Considera:
+                        <ul>
+                            <li><strong>HTTPS:</strong> Essenziale per qualsiasi API in produzione.</li>
+                            <li><strong>Autenticazione/Autorizzazione:</strong> Chi può chiamare questi endpoint? Forse solo tecnici autenticati. Tecnologie come OAuth2, JWT, o Spring Security.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Paginazione:</strong> Se l'elenco degli impianti da manutenere può diventare molto lungo, implementa la paginazione per l'endpoint GET.</li>
+                    <li><strong>Logging Avanzato:</strong> Usa un framework di logging come Log4j o SLF4j per log più dettagliati e configurabili.</li>
+                    <li><strong>Altri Metodi HTTP:</strong> Potresti voler aggiungere un endpoint <code>POST</code> per creare nuovi impianti, o <code>DELETE</code> per rimuoverli (con le dovute cautele!).</li>
+                    <li><strong>Documentazione API:</strong> Strumenti come Swagger/OpenAPI possono generare documentazione interattiva per la tua API, rendendola più facile da usare per gli sviluppatori dell'APP client.</li>
+                    <li><strong>Test Unitari e di Integrazione:</strong> Scrivi test automatici (es. con JUnit e Mockito per i test unitari, e magari Arquillian o REST Assured per i test di integrazione) per garantire la qualità e la robustezza del codice.</li>
+                    <li><strong>JNDI DataSource:</strong> Come accennato, usa un JNDI DataSource configurato nel server per la gestione delle connessioni al database in produzione.</li>
+                </ul>
+                <p>
+                    Il viaggio nello sviluppo software è continuo apprendimento e miglioramento. Speriamo che questa guida ti sia stata utile e ti abbia ispirato. Ora vai e costruisci cose fantastiche!
+                </p>
+                <p style="text-align:center; font-size:1.5em; margin-top:2em;">✨ <strong>Buon Coding!</strong> ✨</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Guida Creata con ❤️ e Codice da un AI Assistant.</p>
+            <p>Animazioni realizzate con <a href="https://greensock.com/gsap/" target="_blank" rel="noopener noreferrer">GSAP</a>.</p>
+        </div>
+    </footer>
+
+    <!-- CDN di GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Animazione Hero Section
+            gsap.from(".hero h1 span", {
+                duration: 0.8,
+                y: 50,
+                opacity: 0,
+                stagger: 0.15,
+                ease: "back.out(1.7)",
+                delay: 0.2
+            });
+            gsap.from(".hero .subtitle", { duration: 1, y: 30, opacity: 0, ease: "power2.out", delay: 0.8 });
+            gsap.from(".hero .cta-button", { duration: 1, y: 30, opacity: 0, ease: "bounce.out", delay: 1.2 });
+
+            // Animazione per le sezioni allo scroll
+            const sections = gsap.utils.toArray('section.gsap-reveal');
+            sections.forEach((section, index) => {
+                gsap.to(section, {
+                    opacity: 1,
+                    y: 0,
+                    visibility: 'visible',
+                    duration: 0.8,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 80%", // Quando l'80% della sezione entra nel viewport
+                        toggleActions: "play none none none", // play on enter
+                        // markers: true, // Utile per debug
+                    }
+                });
+            });
+            
+            // Animazione per i titoli H2 delle sezioni
+             gsap.utils.toArray('section.gsap-reveal h2').forEach(h2 => {
+                gsap.from(h2, {
+                    scrollTrigger: {
+                        trigger: h2,
+                        start: "top 90%",
+                        toggleActions: "play none none none"
+                    },
+                    opacity: 0,
+                    x: -50,
+                    duration: 0.7,
+                    ease: "circ.out"
+                });
+            });
+
+            // Animazione per le card dei prerequisiti
+            gsap.utils.toArray('.prerequisite-card').forEach((card, index) => {
+                 gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: ".prerequisites-grid",
+                        start: "top 80%",
+                        toggleActions: "play none none none"
+                    },
+                    opacity: 0,
+                    scale: 0.8,
+                    y: 30,
+                    duration: 0.5,
+                    delay: index * 0.1, // Effetto stagger
+                    ease: "power2.out"
+                });
+            });
+
+
+            // Smooth scroll per la navbar (opzionale)
+            const navLinks = document.querySelectorAll('nav ul li a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        gsap.to(window, { duration: 1, scrollTo: { y: targetElement, offsetY: 70 }, ease: "power2.inOut" });
+                        
+                        // Attiva link
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // Active link per la navbar allo scroll (semplificato)
+             ScrollTrigger.create({
+                start: 0, // Inizio della pagina
+                onUpdate: self => {
+                    sections.forEach(section => {
+                        const link = document.querySelector(`nav ul li a[href="#${section.id}"]`);
+                        if (link) {
+                            if (self.isActive && section.getBoundingClientRect().top < window.innerHeight * 0.4 && section.getBoundingClientRect().bottom > window.innerHeight * 0.4) {
+                                navLinks.forEach(l => l.classList.remove('active'));
+                                link.classList.add('active');
+                            }
+                        }
+                    });
+                }
+            });
+
+
+            // Animazione "macchina da scrivere" per il titolo principale
+            const titleSpans = document.querySelectorAll("#main-title span");
+            const tlHeroTitle = gsap.timeline({delay:0.1});
+            titleSpans.forEach(span => {
+                const chars = span.textContent.split("");
+                span.innerHTML = ""; // Svuota lo span
+                chars.forEach(char => {
+                    const charSpan = document.createElement('span');
+                    charSpan.className = 'gsap-title-char';
+                    charSpan.textContent = char;
+                    charSpan.style.opacity = "0"; // Inizia invisibile
+                    span.appendChild(charSpan);
+                });
+
+                tlHeroTitle.to(span.querySelectorAll('.gsap-title-char'), {
+                    opacity: 1,
+                    stagger: 0.08,
+                    duration: 0.01, // Veloce per effetto typewriting
+                    ease: "none"
+                }, "-=0.2"); // Leggero overlap per fluidità
+            });
+
+
+            console.log("GSAP animazioni inizializzate!");
+        });
+    </script>
+</body>
+</html>
